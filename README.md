@@ -11,13 +11,16 @@ The problem deals with multiple processes characterised into two types:
 Before starting with the solution, we should know what a semaphore is like. Semaphore is used to resolve process synchronization issues. A semaphore is associated with a critical section and has a queue (a FIFO structure) that maintains a list of blocked processes waiting to obtain the semaphore. When a process enters the blocked queue, it is prevented from executing. Upon receiving a signal from another process, the semaphore activates the process at the front of the blocked queue, allowing it to proceed.
 
 **Analogous of the Process Control Block**
-```struct process{ 
+```
+struct process{ 
     process* next;
     int ID;
     bool state = true;                                     //  true represents an active state of the process while false represents inactive(blocked)
-};```
+};
+```
 
 **The FIFO Structure: Queue**
+```
 class waitingQueue{
    private:
     int size=0;
@@ -59,8 +62,10 @@ class waitingQueue{
         }
 
 };
+```
 
 **The struct semaphore** is linked to the queue. This queue will be storing the list of processes waiting to acquire the semaphore
+```
 struct semaphore {
     int value = 1;
     waitingQueue* wait_queue = new waitingQueue();
@@ -68,14 +73,16 @@ struct semaphore {
     semaphore(int n) {
         value = n;                                          // n=number of resources of that particular type available for accessing
     }
-
 };
+```
 
 **Analogy of system call: wakeUp call**
+```
 void wakeUp(process* p) {
     p->state = true;
 }
-
+```
+```
 void wait(semaphore *s, int id) {
     s=s-1;
     s->value;
@@ -84,7 +91,8 @@ void wait(semaphore *s, int id) {
         s->blocked_queue->push(id);
     }
 }
-
+```
+```
 void signal(semaphore* s) {
     s=s+1;
     s->value;
@@ -94,10 +102,11 @@ void signal(semaphore* s) {
         wakeUp(nextProcess);                               //  wakeUp the next process as it is ready to enter the critical section
     }
 }
-
+```
 
 
 **Starve Free Solution**
+
 The starve-free solution to the Reader-Writer problem involves the use of an additional semaphore called entry_mutex, which must be acquired by any process, whether a reader or a writer, before accessing the rw_mutex or entering the critical section directly. This solution resolves the issue of starvation by preventing readers from continuously accessing the critical section, which could previously have deprived writers of access. If a writer arrives when readers are still present in the critical section, the writer waits in the blockedQueue for the rw_mutex, which is obtained once all readers exit the critical section. The advantage of this solution is that it maintains the efficient reader access to the critical section while ensuring that readers and writers have equal priority and none are starved for access.
 
 Initialization:
@@ -112,6 +121,7 @@ semaphore* entry_mutex=new semaphore(resources);     // used at the begining of 
 
 Reader's Implementation (Starve-Free):
 This block would be called everytime a new reader arrives.
+```
 do {
    // ***** ENTRY SECTION ***** //
     
@@ -136,10 +146,11 @@ do {
   // ***** REMAINDER SECTION ***** //
   
 } while(true);
-
+```
 
 
 Writer's Implementation (Starve-Free):
+```
 do {
     // ***** ENTRY SECTION ***** //
     
@@ -154,7 +165,7 @@ do {
     // ***** REMAINDER SECTION ***** //
     
 } while(true);
-
+```
 
 The approach described above successfully eliminates the issue of starvation, ensuring that neither readers nor writers are deprived of access to the critical section. As a result, this solution provides a starve-free resolution to the Reader-Writer problem.
 
@@ -175,6 +186,7 @@ semaphore* out_mutex = new semaphore(resources);        // controls access to ou
 
 
 Reader's Implementation:
+```
 do {
   
   // ***** ENTRY SECTION ***** //
@@ -194,10 +206,10 @@ do {
     
    // ***** REMAINDER SECTION ***** //
 } while(true);
-
-
+```
 
 Writer's Implementation:
+```
 do {
      // ***** ENTRY SECTION ***** //
      
@@ -220,7 +232,7 @@ do {
      // ***** REMAINDER SECTION ***** //
    
 } while(true);
-
+```
 
 Explanation for Reader's code:
 
