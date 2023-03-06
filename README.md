@@ -11,11 +11,11 @@ The problem deals with multiple processes characterised into two types:
 Before starting with the solution, we should know what a semaphore is like. Semaphore is used to resolve process synchronization issues. A semaphore is associated with a critical section and has a queue (a FIFO structure) that maintains a list of blocked processes waiting to obtain the semaphore. When a process enters the blocked queue, it is prevented from executing. Upon receiving a signal from another process, the semaphore activates the process at the front of the blocked queue, allowing it to proceed.
 
 **Analogous of the Process Control Block**
-struct process{ 
+```struct process{ 
     process* next;
     int ID;
     bool state = true;                                     //  true represents an active state of the process while false represents inactive(blocked)
-};
+};```
 
 **The FIFO Structure: Queue**
 class waitingQueue{
